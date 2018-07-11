@@ -1317,9 +1317,9 @@ def writes(mdict, filename='data.h5', truncate_existing=False,
 
             for targetname, data in items:
 
-            # Hand off to the low level function.
-            lowlevel.write_data(f, grp, targetname, data,
-                                None, options)
+                # Hand off to the low level function.
+                lowlevel.write_data(f, grp, targetname, data,
+                                    None, options)
     except:
         raise
     finally:
@@ -1465,7 +1465,7 @@ def reads(paths, filename='data.h5', options=None, **keywords):
     # Process the paths and stuff the group names and target names as
     # tuples into toread.
     toread = []
-    for p in paths:    
+    for p in paths:
         # Remove double slashes and a non-root trailing slash.
 
         path = posixpath.normpath(p)
