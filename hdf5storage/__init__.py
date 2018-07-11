@@ -42,6 +42,8 @@ import inspect
 import datetime
 import h5py
 
+from collections import defaultdict
+
 from . import lowlevel
 from hdf5storage.lowlevel import Hdf5storageError, CantReadError, \
     TypeNotMatlabCompatibleError
@@ -1048,6 +1050,7 @@ class MarshallerCollection(object):
 
         """
         if tp in self._types:
+            return self._types[tp]
             return copy.deepcopy(self._types[tp])
         else:
             return None
@@ -1184,7 +1187,7 @@ def writes(mdict, filename='data.h5', truncate_existing=False,
     # constructed where he first element is the group name, the second
     # the target name (name of the Dataset/Group holding the data), and
     # the third element the data to write.
-    towrite = []
+    towrite = defaultdict(list)
     for p, v in mdict.items():
         # Remove double slashes and a non-root trailing slash.
         path = posixpath.normpath(p)
@@ -1205,7 +1208,7 @@ def writes(mdict, filename='data.h5', truncate_existing=False,
             targetname = '.'
 
         # Pack into towrite.
-        towrite.append((groupname, targetname, v))
+        towrite[groupname].append((targetname, v))
 
     # Open/create the hdf5 file but don't write the data yet since the
     # userblock still needs to be set. This is all wrapped in a try
@@ -1306,13 +1309,13 @@ def writes(mdict, filename='data.h5', truncate_existing=False,
         f = h5py.File(filename)
 
         # Go through each element of towrite and write them.
-        for groupname, targetname, data in towrite:
+
+        for groupname, items in towrite.items():
             # Need to make sure groupname is a valid group in f and grab its
             # handle to pass on to the low level function.
-            if groupname not in f:
-                grp = f.require_group(groupname)
-            else:
-                grp = f[groupname]
+            grp = f.require_group(groupname)
+
+            for targetname, data in items:
 
             # Hand off to the low level function.
             lowlevel.write_data(f, grp, targetname, data,
