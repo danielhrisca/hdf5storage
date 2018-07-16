@@ -683,7 +683,7 @@ class NumpyScalarArrayMarshaller(TypeMarshaller):
         #
         # A flag, wrote_as_struct, is set depending on which path is
         # taken, which is then passed onto write_metadata.
-        
+
         if data_to_store.dtype.fields is not None \
                 and h5py.check_dtype(ref=data_to_store.dtype) \
                 is not h5py.Reference \
@@ -709,7 +709,7 @@ class NumpyScalarArrayMarshaller(TypeMarshaller):
             # already exists but is not a group, it needs to be deleted
             # before being created.
 
-            grp2 = grp.create_group(name)
+            grp2 = path = grp.create_group(name)
 
             # Write the metadata, and set the MATLAB_class to 'struct'
             # explicitly.
